@@ -37,7 +37,7 @@ func (d *deleteBuilderData) WhereOr(conditions ...Condition) *predicateData {
 }
 
 // Build the UPDATE command
-func (d *deleteBuilderData) Build() (query string, args []interface{}) {
+func (d *deleteBuilderData) Build() (query string, args []any) {
 	if d.table == "" {
 		return "", nil
 	}
@@ -49,7 +49,7 @@ func (d *deleteBuilderData) Build() (query string, args []interface{}) {
 }
 
 // addWhere appends WHERE clause
-func (d *deleteBuilderData) addWhere(sb *strings.Builder, args []interface{}) []interface{} {
+func (d *deleteBuilderData) addWhere(sb *strings.Builder, args []any) []any {
 	queryWhere, argsWhere := d.where.Build(d.engine)
 	if len(queryWhere) > 0 {
 		sb.WriteString("\nWHERE ")

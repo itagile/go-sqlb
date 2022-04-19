@@ -15,7 +15,7 @@ VALUES (?, ?)`
 	ins.Set("Col2", "2")
 	query, args := ins.Build()
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1, "2"}, args)
+	require.Equal(t, []any{1, "2"}, args)
 }
 
 func TestNewPostgreSQLInsertBuilder(t *testing.T) {
@@ -25,7 +25,7 @@ VALUES ($1)`
 	ins.Set("Col1", 1)
 	query, args := ins.Build()
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1}, args)
+	require.Equal(t, []any{1}, args)
 }
 
 func TestNewORAInsertBuilder(t *testing.T) {
@@ -36,7 +36,7 @@ VALUES (:v1, :v2)`
 	ins.Set("Col2", "2")
 	query, args := ins.Build()
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1, "2"}, args)
+	require.Equal(t, []any{1, "2"}, args)
 }
 
 func TestEmptyInsertBuilderWhenNoColumnsSet(t *testing.T) {
@@ -61,5 +61,5 @@ func TestInsertBuilderWhenValueChanged(t *testing.T) {
 	ins.Set("Col1", 1)
 	ins.Set("Col1", 2)
 	_, args := ins.Build()
-	require.Equal(t, []interface{}{2}, args)
+	require.Equal(t, []any{2}, args)
 }

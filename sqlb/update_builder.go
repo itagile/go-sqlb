@@ -40,7 +40,7 @@ func (u *updateBuilderData) WhereOr(conditions ...Condition) *predicateData {
 }
 
 // Build the UPDATE command
-func (u *updateBuilderData) Build() (query string, args []interface{}) {
+func (u *updateBuilderData) Build() (query string, args []any) {
 	if u.table == "" || len(u.values) == 0 {
 		return "", nil
 	}
@@ -50,7 +50,7 @@ func (u *updateBuilderData) Build() (query string, args []interface{}) {
 	sb.WriteString(" SET\n")
 	last := len(u.values) - 1
 	// Appends setter for each column
-	args = make([]interface{}, 0, len(u.values))
+	args = make([]any, 0, len(u.values))
 	for index, item := range u.values {
 		sb.WriteString(item.name)
 		sb.WriteString(" = ?")
@@ -65,7 +65,7 @@ func (u *updateBuilderData) Build() (query string, args []interface{}) {
 }
 
 // addWhere appends WHERE clause
-func (u *updateBuilderData) addWhere(sb *strings.Builder, args []interface{}) []interface{} {
+func (u *updateBuilderData) addWhere(sb *strings.Builder, args []any) []any {
 	queryWhere, argsWhere := u.where.Build(u.engine)
 	if len(queryWhere) > 0 {
 		sb.WriteString("\nWHERE ")

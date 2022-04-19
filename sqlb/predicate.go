@@ -3,7 +3,7 @@ package sqlb
 import "strings"
 
 type Condition interface {
-	Build(engine Engine) (query string, args []interface{})
+	Build(engine Engine) (query string, args []any)
 }
 
 const (
@@ -16,7 +16,7 @@ type predicateData struct {
 	conditions []Condition
 }
 
-func (p *predicateData) Build(engine Engine) (query string, args []interface{}) {
+func (p *predicateData) Build(engine Engine) (query string, args []any) {
 	if p == nil || len(p.conditions) == 0 {
 		return "", nil
 	}
@@ -27,7 +27,7 @@ func (p *predicateData) Build(engine Engine) (query string, args []interface{}) 
 		operatorSearch = " " + and + " "
 	}
 	var sb strings.Builder
-	args = make([]interface{}, 0, len(p.conditions))
+	args = make([]any, 0, len(p.conditions))
 	for _, cond := range p.conditions {
 		queryCond, argsCond := cond.Build(engine)
 		if queryCond != "" {

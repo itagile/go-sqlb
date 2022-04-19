@@ -12,7 +12,7 @@ func TestSingleEq(t *testing.T) {
 	expr := sqlb.Expr("Col1").Eq(1)
 	query, args := expr.Build(sqlb.DefaultEngine())
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1}, args)
+	require.Equal(t, []any{1}, args)
 }
 
 func TestMultipleEq(t *testing.T) {
@@ -20,7 +20,7 @@ func TestMultipleEq(t *testing.T) {
 	expr := sqlb.Expr("Col1", "Col2").Eq(1)
 	query, args := expr.Build(sqlb.DefaultEngine())
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1, 1}, args)
+	require.Equal(t, []any{1, 1}, args)
 }
 
 func TestSingleEqIsNull(t *testing.T) {

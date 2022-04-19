@@ -8,18 +8,18 @@ func Expr(expressions ...string) expressionData {
 	return expressions
 }
 
-type ExpressionBuilder func(engine Engine, expression string, sb *strings.Builder) []interface{}
+type ExpressionBuilder func(engine Engine, expression string, sb *strings.Builder) []any
 
-func (e expressionData) Build(engine Engine) (query string, args []interface{}) {
-	return BuildExpression(e, engine, func(engine Engine, expression string, sb *strings.Builder) []interface{} {
+func (e expressionData) Build(engine Engine) (query string, args []any) {
+	return BuildExpression(e, engine, func(engine Engine, expression string, sb *strings.Builder) []any {
 		sb.WriteString(expression)
 		return nil
 	})
 }
 
-func BuildExpression(e expressionData, engine Engine, handler ExpressionBuilder) (query string, args []interface{}) {
+func BuildExpression(e expressionData, engine Engine, handler ExpressionBuilder) (query string, args []any) {
 	var sb strings.Builder
-	args = make([]interface{}, 0, len(e))
+	args = make([]any, 0, len(e))
 	enclose := false
 	for _, expression := range e {
 		if expression != "" {

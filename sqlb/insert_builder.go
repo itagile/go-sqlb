@@ -6,12 +6,12 @@ import (
 
 // Setter contract to Set value in InsertBuilder and UpdateBuilder
 type Setter interface {
-	Set(name string, value interface{})
+	Set(name string, value any)
 }
 
 // SQLBuilder contract for building the final SQL
 type SQLBuilder interface {
-	Build() (query string, args []interface{})
+	Build() (query string, args []any)
 }
 
 // InsertBuilder generates simple INSERT from values
@@ -22,7 +22,7 @@ type InsertBuilder interface {
 
 type nameValue struct {
 	name  string
-	value interface{}
+	value any
 }
 
 type sqlData struct {
@@ -49,7 +49,7 @@ func NewInsertBuilder(table string, engine Engine) *insertBuilderData {
 }
 
 // Set column value in Setter contract
-func (s *sqlData) Set(name string, value interface{}) {
+func (s *sqlData) Set(name string, value any) {
 	item, exists := s.index[name]
 	if exists {
 		item.value = value
@@ -61,7 +61,7 @@ func (s *sqlData) Set(name string, value interface{}) {
 }
 
 // Build INSERT command
-func (i *insertBuilderData) Build() (query string, args []interface{}) {
+func (i *insertBuilderData) Build() (query string, args []any) {
 	if i.table == "" || len(i.values) == 0 {
 		return "", nil
 	}
@@ -80,7 +80,7 @@ func (i *insertBuilderData) Build() (query string, args []interface{}) {
 		}
 	}
 	sb.WriteString("\nVALUES (")
-	args = make([]interface{}, 0, len(i.values))
+	args = make([]any, 0, len(i.values))
 	// Appends values
 	for index, item := range i.values {
 		sb.WriteString(i.engine.Placeholder())

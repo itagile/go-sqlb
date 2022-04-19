@@ -16,7 +16,7 @@ WHERE Col1 = ? AND Col2 = ?`
 	where.And(sqlb.Expr("Col2").Eq("2"))
 	query, args := sel.Build()
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1, "2"}, args)
+	require.Equal(t, []any{1, "2"}, args)
 }
 
 func TestNewRawSelectBuilderWithWhere(t *testing.T) {
@@ -30,7 +30,7 @@ WHERE Col3 IS NULL`)
 	where.And(sqlb.Expr("Col2").Eq("2"))
 	query, args := sel.Build()
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1, "2"}, args)
+	require.Equal(t, []any{1, "2"}, args)
 }
 
 func TestNewRawSelectBuilderWithEmptyWhere(t *testing.T) {
@@ -44,7 +44,7 @@ WHERE`)
 	where.And(sqlb.Expr("Col2").Eq("2"))
 	query, args := sel.Build()
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1, "2"}, args)
+	require.Equal(t, []any{1, "2"}, args)
 }
 
 func TestEmptyRawSelectBuilder(t *testing.T) {
@@ -96,7 +96,7 @@ HAVING Col1 = ? OR Col2 LIKE ?`
 	sel.HavingOr(sqlb.Expr("Col1").Eq(1), sqlb.Expr("Col2").Like("2"))
 	query, args := sel.Build()
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1, "2"}, args)
+	require.Equal(t, []any{1, "2"}, args)
 }
 
 func TestNewRawSelectBuilderWithOrderBy(t *testing.T) {

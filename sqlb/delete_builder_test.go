@@ -22,7 +22,7 @@ WHERE ID = ?`
 	del.Where(sqlb.Expr("ID").Eq(1))
 	query, args := del.Build()
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1}, args)
+	require.Equal(t, []any{1}, args)
 }
 
 func TestNewDeleteBuilderWithWhereOr(t *testing.T) {
@@ -32,7 +32,7 @@ WHERE Col3 LIKE ? OR Col4 = ?`
 	del.WhereOr(sqlb.Expr("Col3").Like("like1"), sqlb.Expr("Col4").Eq(2))
 	query, args := del.Build()
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{"like1", 2}, args)
+	require.Equal(t, []any{"like1", 2}, args)
 }
 
 func TestEmptyDeleteBuilderWhenNoTableName(t *testing.T) {

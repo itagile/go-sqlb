@@ -7,11 +7,11 @@ type expresisonILikeData struct {
 	like string
 }
 
-func (e expresisonILikeData) Build(engine Engine) (query string, args []interface{}) {
+func (e expresisonILikeData) Build(engine Engine) (query string, args []any) {
 	return BuildExpression(e.expressionData, engine, e.buildHandler)
 }
 
-func (e expresisonILikeData) buildHandler(engine Engine, expression string, sb *strings.Builder) (args []interface{}) {
+func (e expresisonILikeData) buildHandler(engine Engine, expression string, sb *strings.Builder) (args []any) {
 	query, arg := engine.ILike(expression, e.like)
 	sb.WriteString(query)
 	args = append(args, arg)

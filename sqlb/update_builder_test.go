@@ -16,7 +16,7 @@ Col2 = ?`
 	upd.Set("Col2", "2")
 	query, args := upd.Build()
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1, "2"}, args)
+	require.Equal(t, []any{1, "2"}, args)
 }
 
 func TestNewUpdateBuilderWithWhere(t *testing.T) {
@@ -30,7 +30,7 @@ WHERE ID = ?`
 	upd.Where(sqlb.Expr("ID").Eq(1))
 	query, args := upd.Build()
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1, "2", 1}, args)
+	require.Equal(t, []any{1, "2", 1}, args)
 }
 
 func TestNewUpdateBuilderWithWhereOr(t *testing.T) {
@@ -44,7 +44,7 @@ WHERE Col3 LIKE ? OR Col4 = ?`
 	upd.WhereOr(sqlb.Expr("Col3").Like("like1"), sqlb.Expr("Col4").Eq(2))
 	query, args := upd.Build()
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1, "2", "like1", 2}, args)
+	require.Equal(t, []any{1, "2", "like1", 2}, args)
 }
 
 func TestEmptyUpdateBuilderWhenNoColumnsSet(t *testing.T) {
@@ -74,5 +74,5 @@ WHERE ID = ?`
 	upd.Where(sqlb.Expr("ID").Eq(1))
 	query, args := upd.Build()
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{2, 1}, args)
+	require.Equal(t, []any{2, 1}, args)
 }

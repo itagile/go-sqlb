@@ -14,7 +14,7 @@ func TestSingleILike(t *testing.T) {
 	query, args := expr.Build(sqlb.DefaultEngine())
 	require.Equal(t, expected, query)
 	likeTestExpected := strings.ToUpper(likeTest)
-	require.Equal(t, []interface{}{likeTestExpected}, args)
+	require.Equal(t, []any{likeTestExpected}, args)
 }
 
 func TestMultipleILike(t *testing.T) {
@@ -23,5 +23,5 @@ func TestMultipleILike(t *testing.T) {
 	query, args := expr.Build(sqlb.DefaultEngine())
 	require.Equal(t, expected, query)
 	likeTestExpected := strings.ToUpper(likeTest)
-	require.Equal(t, []interface{}{likeTestExpected, likeTestExpected}, args)
+	require.Equal(t, []any{likeTestExpected, likeTestExpected}, args)
 }

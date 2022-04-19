@@ -20,7 +20,7 @@ func TestNewAndSingle(t *testing.T) {
 	pre := sqlb.NewAnd(sqlb.Expr("Col1").Eq(1))
 	query, args := pre.Build(sqlb.DefaultEngine())
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1}, args)
+	require.Equal(t, []any{1}, args)
 }
 
 func TestNewAndMixedOr(t *testing.T) {
@@ -30,7 +30,7 @@ func TestNewAndMixedOr(t *testing.T) {
 	pre.Or(sqlb.Expr("Col2").Eq(2), sqlb.Expr("Col3").Eq(3))
 	query, args := pre.Build(sqlb.DefaultEngine())
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1, 2, 3}, args)
+	require.Equal(t, []any{1, 2, 3}, args)
 }
 
 func TestNewOrMixedAnd(t *testing.T) {
@@ -40,5 +40,5 @@ func TestNewOrMixedAnd(t *testing.T) {
 	pre.And(sqlb.Expr("Col2").Eq(2), sqlb.Expr("Col3").Eq(3))
 	query, args := pre.Build(sqlb.DefaultEngine())
 	require.Equal(t, expected, query)
-	require.Equal(t, []interface{}{1, 2, 3}, args)
+	require.Equal(t, []any{1, 2, 3}, args)
 }

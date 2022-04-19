@@ -19,12 +19,12 @@ type selectBuilderBase struct {
 
 type rawSelectBuilderData struct {
 	rawSelect string
-	args      []interface{}
+	args      []any
 	*selectBuilderBase
 }
 
 // NewSelectBuilder constructs an SelectBuilder with the provided ParameterPlaceholder
-func NewRawSelectBuilder(engine Engine, rawSelect string, args ...interface{}) *rawSelectBuilderData {
+func NewRawSelectBuilder(engine Engine, rawSelect string, args ...any) *rawSelectBuilderData {
 	return &rawSelectBuilderData{
 		rawSelect: rawSelect,
 		args:      args,
@@ -99,7 +99,7 @@ func includesClause(rawSelectUpper string, clause string) bool {
 
 // addClause adds the clause to the sb using the predicate
 func addClause(clause string, p *predicateData, engine Engine, sb *strings.Builder,
-	args []interface{}, rawSelectUpper string) []interface{} {
+	args []any, rawSelectUpper string) []any {
 	queryWhere, argsWhere := p.Build(engine)
 	if len(queryWhere) > 0 {
 		var text string
@@ -127,7 +127,7 @@ func addCommaSeparated(keyword string, slice []string, sb *strings.Builder) {
 }
 
 // Build the SELECT command
-func (s *rawSelectBuilderData) Build() (query string, args []interface{}) {
+func (s *rawSelectBuilderData) Build() (query string, args []any) {
 	if s.rawSelect == "" {
 		return "", nil
 	}
