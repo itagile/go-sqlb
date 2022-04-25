@@ -93,7 +93,7 @@ func includesClause(rawSelectUpper string, clause string) bool {
 	// Counts the number of parentheses in WHERE clause
 	openCount := strings.Count(whereClause, "(")
 	closeCount := strings.Count(whereClause, ")")
-	// If parentheses area balanced returns true
+	// If parentheses are balanced returns true
 	return openCount == closeCount
 }
 
@@ -135,10 +135,10 @@ func (s *rawSelectBuilderData) Build() (query string, args []any) {
 	sb.WriteString(strings.TrimSpace(s.rawSelect))
 	rawSelectUpper := strings.ToUpper(s.rawSelect)
 	args = s.args
-	// Appends WHERE clause if present
+	// Appends WHERE clause if not present
 	args = addClause("WHERE", s.where, s.engine, &sb, args, rawSelectUpper)
 	addCommaSeparated("GROUP BY", s.groupBy, &sb)
-	// Appends HAVING clause if present
+	// Appends HAVING clause if not present
 	args = addClause("HAVING", s.having, s.engine, &sb, args, rawSelectUpper)
 	addCommaSeparated("ORDER BY", s.orderBy, &sb)
 	return sb.String(), args
