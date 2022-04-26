@@ -33,20 +33,6 @@ WHERE Col3 IS NULL`)
 	require.Equal(t, []any{1, "2"}, args)
 }
 
-func TestNewRawSelectBuilderWithEmptyWhere(t *testing.T) {
-	expected := `SELECT * FROM TABLE
-WHERE
-AND Col1 = ? AND Col2 = ?`
-	sel := sqlb.NewRawSelectBuilder(sqlb.DefaultEngine(), `SELECT * FROM TABLE
-WHERE`)
-	where := sel.Where()
-	where.And(sqlb.Expr("Col1").Eq(1))
-	where.And(sqlb.Expr("Col2").Eq("2"))
-	query, args := sel.Build()
-	require.Equal(t, expected, query)
-	require.Equal(t, []any{1, "2"}, args)
-}
-
 func TestEmptyRawSelectBuilder(t *testing.T) {
 	expected := ""
 	sel := sqlb.NewRawSelectBuilder(sqlb.DefaultEngine(), "")
