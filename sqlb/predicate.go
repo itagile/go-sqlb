@@ -31,23 +31,27 @@ func (p *predicateData) Build(engine Engine) (query string, args []any) {
 	for _, cond := range p.conditions {
 		queryCond, argsCond := cond.Build(engine)
 		if queryCond != "" {
-			if sb.Len() > 0 {
-				sb.WriteRune(' ')
-				sb.WriteString(p.operator)
-				sb.WriteRune(' ')
-			}
-			enclose := strings.Contains(queryCond, operatorSearch)
-			if enclose {
-				sb.WriteRune('(')
-			}
-			sb.WriteString(queryCond)
-			if enclose {
-				sb.WriteRune(')')
-			}
+			p.addCond(&sb, queryCond, operatorSearch)
 			args = append(args, argsCond...)
 		}
 	}
 	return sb.String(), args
+}
+
+func (p *predicateData) addCond(sb *strings.Builder, queryCond string, operatorSearch string) {
+	if sb.Len() > 0 {
+		sb.WriteRune(' ')
+		sb.WriteString(p.operator)
+		sb.WriteRune(' ')
+	}
+	enclose := strings.Contains(queryCond, operatorSearch)
+	if enclose {
+		sb.WriteRune('(')
+	}
+	sb.WriteString(queryCond)
+	if enclose {
+		sb.WriteRune(')')
+	}
 }
 
 func newPredicateData(operator string, conditions []Condition) *predicateData {

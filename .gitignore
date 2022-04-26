@@ -33,3 +33,7 @@
 
 # End of https://www.toptal.com/developers/gitignore/api/go,vscode
 
+sonar-project.properties
+.scannerwork/
+report.json
+sonar-scan.sh
