@@ -7,11 +7,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewUpdateBuilderWithoutWhere(t *testing.T) {
+func TestNewUpdateWithoutWhere(t *testing.T) {
 	expected := `UPDATE schema.myTable SET
 Col1 = ?,
 Col2 = ?`
-	upd := sqlb.NewUpdateBuilder(sqlb.DefaultEngine(), "schema.myTable")
+	upd := sqlb.NewUpdate(sqlb.DefaultEngine(), "schema.myTable")
 	upd.Set("Col1", 1)
 	upd.Set("Col2", "2")
 	query, args := upd.Build()
@@ -19,12 +19,12 @@ Col2 = ?`
 	require.Equal(t, []any{1, "2"}, args)
 }
 
-func TestNewUpdateBuilderWithWhere(t *testing.T) {
+func TestNewUpdateWithWhere(t *testing.T) {
 	expected := `UPDATE schema.myTable SET
 Col1 = ?,
 Col2 = ?
 WHERE ID = ?`
-	upd := sqlb.NewUpdateBuilder(sqlb.DefaultEngine(), "schema.myTable")
+	upd := sqlb.NewUpdate(sqlb.DefaultEngine(), "schema.myTable")
 	upd.Set("Col1", 1)
 	upd.Set("Col2", "2")
 	upd.Where(sqlb.Expr("ID").Eq(1))
@@ -33,12 +33,12 @@ WHERE ID = ?`
 	require.Equal(t, []any{1, "2", 1}, args)
 }
 
-func TestNewUpdateBuilderWithWhereOr(t *testing.T) {
+func TestNewUpdateWithWhereOr(t *testing.T) {
 	expected := `UPDATE schema.myTable SET
 Col1 = ?,
 Col2 = ?
 WHERE Col3 LIKE ? OR Col4 = ?`
-	upd := sqlb.NewUpdateBuilder(sqlb.DefaultEngine(), "schema.myTable")
+	upd := sqlb.NewUpdate(sqlb.DefaultEngine(), "schema.myTable")
 	upd.Set("Col1", 1)
 	upd.Set("Col2", "2")
 	upd.WhereOr(sqlb.Expr("Col3").Like("like1"), sqlb.Expr("Col4").Eq(2))
@@ -47,28 +47,28 @@ WHERE Col3 LIKE ? OR Col4 = ?`
 	require.Equal(t, []any{1, "2", "like1", 2}, args)
 }
 
-func TestEmptyUpdateBuilderWhenNoColumnsSet(t *testing.T) {
+func TestEmptyUpdateWhenNoColumnsSet(t *testing.T) {
 	expected := ""
-	ins := sqlb.NewUpdateBuilder(sqlb.DefaultEngine(), "schema.myTable")
+	ins := sqlb.NewUpdate(sqlb.DefaultEngine(), "schema.myTable")
 	query, args := ins.Build()
 	require.Equal(t, expected, query)
 	require.Nil(t, args)
 }
 
-func TestEmptyUpdateBuilderWhenNoTableName(t *testing.T) {
+func TestEmptyUpdateWhenNoTableName(t *testing.T) {
 	expected := ""
-	ins := sqlb.NewUpdateBuilder(sqlb.DefaultEngine(), "")
+	ins := sqlb.NewUpdate(sqlb.DefaultEngine(), "")
 	ins.Set("Col1", 1)
 	query, args := ins.Build()
 	require.Equal(t, expected, query)
 	require.Nil(t, args)
 }
 
-func TestUpdateBuilderWhenValueChanged(t *testing.T) {
+func TestUpdateWhenValueChanged(t *testing.T) {
 	expected := `UPDATE schema.myTable SET
 Col1 = ?
 WHERE ID = ?`
-	upd := sqlb.NewUpdateBuilder(sqlb.DefaultEngine(), "schema.myTable")
+	upd := sqlb.NewUpdate(sqlb.DefaultEngine(), "schema.myTable")
 	upd.Set("Col1", 1)
 	upd.Set("Col1", 2)
 	upd.Where(sqlb.Expr("ID").Eq(1))

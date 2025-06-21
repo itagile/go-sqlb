@@ -4,22 +4,22 @@ import (
 	"strings"
 )
 
-// UpdateBuilder generates simple UPDATE from values
-type UpdateBuilder interface {
+// Update generates simple UPDATE from values.
+type Update interface {
 	Setter
 	WhereBuilder
-	SQLBuilder
+	Builder
 }
 
-type updateBuilderData struct {
+type updateData struct {
 	*sqlData
 	where *predicateData
 }
 
-// NewUpdateBuilder constructs an UpdateBuilder with the provided ParameterPlaceholder
-func NewUpdateBuilder(engine Engine, table string) *updateBuilderData {
+// NewUpdate constructs an Update with the provided ParameterPlaceholder.
+func NewUpdate(engine Engine, table string) *updateData {
 	index := map[string]*nameValue{}
-	return &updateBuilderData{
+	return &updateData{
 		sqlData: &sqlData{
 			table:  table,
 			index:  index,
@@ -28,20 +28,20 @@ func NewUpdateBuilder(engine Engine, table string) *updateBuilderData {
 	}
 }
 
-// Where for simple where condition initialization with AND operator
-func (u *updateBuilderData) Where(conditions ...Condition) *predicateData {
+// Where for simple where condition initialization with AND operator.
+func (u *updateData) Where(conditions ...Condition) *predicateData {
 	u.where = NewAnd(conditions...)
 	return u.where
 }
 
-// WhereOr for simple where condition initialization with OR operator
-func (u *updateBuilderData) WhereOr(conditions ...Condition) *predicateData {
+// WhereOr for simple where condition initialization with OR operator.
+func (u *updateData) WhereOr(conditions ...Condition) *predicateData {
 	u.where = NewOr(conditions...)
 	return u.where
 }
 
-// Build the UPDATE command
-func (u *updateBuilderData) Build() (query string, args []any) {
+// Build the UPDATE command.
+func (u *updateData) Build() (query string, args []any) {
 	if u.table == "" || len(u.values) == 0 {
 		return "", nil
 	}
@@ -50,7 +50,7 @@ func (u *updateBuilderData) Build() (query string, args []any) {
 	sb.WriteString(u.table)
 	sb.WriteString(" SET\n")
 	last := len(u.values) - 1
-	// Appends setter for each column
+	// Appends setter for each column.
 	args = make([]any, 0, len(u.values))
 	for index, item := range u.values {
 		sb.WriteString(item.name)
@@ -65,8 +65,8 @@ func (u *updateBuilderData) Build() (query string, args []any) {
 	return sb.String(), args
 }
 
-// addWhere appends WHERE clause
-func (u *updateBuilderData) addWhere(sb *strings.Builder, args []any) []any {
+// addWhere appends WHERE clause.
+func (u *updateData) addWhere(sb *strings.Builder, args []any) []any {
 	if u.where == nil {
 		return args
 	}

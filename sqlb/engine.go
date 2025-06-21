@@ -6,17 +6,17 @@ import (
 )
 
 type Engine interface {
-	ParameterPlaceholder
+	Placeholderer
 	ILike(expression string, like string) (query string, arg string)
 }
 
 type defaultEngine struct {
-	ParameterPlaceholder
+	Placeholderer
 }
 
 func DefaultEngine() *defaultEngine {
 	return &defaultEngine{
-		ParameterPlaceholder: QuestionPlaceholderData,
+		Placeholderer: QuestionPlaceholderData,
 	}
 }
 
@@ -31,7 +31,7 @@ type postgreSQLEngine defaultEngine
 
 func PostgreSQLEngine() *postgreSQLEngine {
 	return &postgreSQLEngine{
-		ParameterPlaceholder: NewDollarPlaceholder(),
+		Placeholderer: NewDollarPlaceholder(),
 	}
 }
 
@@ -44,6 +44,6 @@ func (e *postgreSQLEngine) ILike(expression string, like string) (query string, 
 
 func ORACLEEngine() *defaultEngine {
 	return &defaultEngine{
-		ParameterPlaceholder: NewColonPlaceholder(),
+		Placeholderer: NewColonPlaceholder(),
 	}
 }

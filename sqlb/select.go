@@ -4,12 +4,12 @@ import (
 	"strings"
 )
 
-// SelectBuilder generates simple SELECT
-type SelectBuilder interface {
-	SQLBuilder
+// Select generates simple SELECT.
+type Select interface {
+	Builder
 }
 
-type selectBuilderBase struct {
+type selectBase struct {
 	engine  Engine
 	where   *predicateData
 	groupBy []string
@@ -17,73 +17,73 @@ type selectBuilderBase struct {
 	orderBy []string
 }
 
-type rawSelectBuilderData struct {
+type rawSelectData struct {
 	rawSelect string
 	args      []any
-	*selectBuilderBase
+	*selectBase
 }
 
-// NewRawSelectBuilder constructs an SelectBuilder with the provided ParameterPlaceholder
-func NewRawSelectBuilder(engine Engine, rawSelect string, args ...any) *rawSelectBuilderData {
-	return &rawSelectBuilderData{
+// NewRawSelect constructs an Select with the provided provided engine and select statement.
+func NewRawSelect(engine Engine, rawSelect string, args ...any) *rawSelectData {
+	return &rawSelectData{
 		rawSelect: rawSelect,
 		args:      args,
-		selectBuilderBase: &selectBuilderBase{
+		selectBase: &selectBase{
 			engine: engine,
 		},
 	}
 }
 
-// Where for simple where condition initialization with AND operator
-func (s *selectBuilderBase) Where(conditions ...Condition) *predicateData {
+// Where for simple where condition initialization with AND operator.
+func (s *selectBase) Where(conditions ...Condition) *predicateData {
 	s.where = NewAnd(conditions...)
 	return s.where
 }
 
-// WhereOr for simple where condition initialization with OR operator
-func (s *selectBuilderBase) WhereOr(conditions ...Condition) *predicateData {
+// WhereOr for simple where condition initialization with OR operator.
+func (s *selectBase) WhereOr(conditions ...Condition) *predicateData {
 	s.where = NewOr(conditions...)
 	return s.where
 }
 
-// GroupBy adds columns to GROUP BY statement
-func (s *selectBuilderBase) GroupBy(columns ...string) {
+// GroupBy adds columns to GROUP BY statement.
+func (s *selectBase) GroupBy(columns ...string) {
 	s.groupBy = append(s.groupBy, columns...)
 }
 
-// OrderBy adds columns to ORDER BY statement
-func (s *selectBuilderBase) OrderBy(columns ...string) {
+// OrderBy adds columns to ORDER BY statement.
+func (s *selectBase) OrderBy(columns ...string) {
 	s.orderBy = append(s.orderBy, columns...)
 }
 
-// Adds ORDER keyword to column name for ORDER BY keyword
+// Adds ORDER keyword to column name for ORDER BY keyword.
 func order(column string, order string) string {
 	return column + " " + order
 }
 
-// Adds ASC keyword to column name for order by
+// Adds ASC keyword to column name for order by.
 func Asc(column string) string {
 	return order(column, "ASC")
 }
 
-// Adds DESC keyword to column name for order by
+// Adds DESC keyword to column name for order by.
 func Desc(column string) string {
 	return order(column, "DESC")
 }
 
-// Having for simple having condition initialization with AND operator
-func (s *selectBuilderBase) Having(conditions ...Condition) *predicateData {
+// Having for simple having condition initialization with AND operator.
+func (s *selectBase) Having(conditions ...Condition) *predicateData {
 	s.having = NewAnd(conditions...)
 	return s.having
 }
 
-// HavingOr for simple having condition initialization with OR operator
-func (s *selectBuilderBase) HavingOr(conditions ...Condition) *predicateData {
+// HavingOr for simple having condition initialization with OR operator.
+func (s *selectBase) HavingOr(conditions ...Condition) *predicateData {
 	s.having = NewOr(conditions...)
 	return s.having
 }
 
-// includesClause detects if raw query includes clause. Query parameter comes with ToUpper applied
+// includesClause detects if raw query includes clause. Query parameter comes with ToUpper applied.
 func includesClause(rawSelectUpper string, clause string) bool {
 	// TODO remove parentheses from rawSelectUpper
 	index := strings.LastIndex(rawSelectUpper, clause)
@@ -98,7 +98,7 @@ func includesClause(rawSelectUpper string, clause string) bool {
 	return openCount == closeCount
 }
 
-// addClause adds the clause to the sb using the predicate
+// addClause adds the clause to the sb using the predicate.
 func addClause(clause string, p Predicate, engine Engine, sb *strings.Builder,
 	args []any, rawSelectUpper string) []any {
 	if p == nil {
@@ -110,7 +110,7 @@ func addClause(clause string, p Predicate, engine Engine, sb *strings.Builder,
 	}
 	var text string
 	if includesClause(rawSelectUpper, clause) {
-		text = p.getOperator()
+		text = p.Operator()
 	} else {
 		text = clause
 	}
@@ -130,8 +130,8 @@ func addCommaSeparated(keyword string, slice []string, sb *strings.Builder) {
 	}
 }
 
-// Build the SELECT command
-func (s *rawSelectBuilderData) Build() (query string, args []any) {
+// Build the SELECT command.
+func (s *rawSelectData) Build() (query string, args []any) {
 	if s.rawSelect == "" {
 		return "", nil
 	}

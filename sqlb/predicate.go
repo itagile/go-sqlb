@@ -20,9 +20,9 @@ const (
 )
 
 type WhereBuilder interface {
-	// Where for simple where condition initialization with AND operator
+	// Where for simple where condition initialization with AND operator.
 	Where(conditions ...Condition) *predicateData
-	// WhereOr for simple where condition initialization with OR operator
+	// WhereOr for simple where condition initialization with OR operator.
 	WhereOr(conditions ...Condition) *predicateData
 }
 
