@@ -16,7 +16,7 @@ type defaultEngine struct {
 
 func DefaultEngine() *defaultEngine {
 	return &defaultEngine{
-		Placeholderer: QuestionPlaceholderData,
+		Placeholderer: QuestionPlaceholder,
 	}
 }
 

@@ -4,55 +4,44 @@ import (
 	"strings"
 )
 
-// Select generates simple SELECT.
-type Select interface {
-	Builder
-}
-
-type selectBase struct {
-	engine  Engine
-	where   *predicateData
-	groupBy []string
-	having  *predicateData
-	orderBy []string
-}
-
-type rawSelectData struct {
+type Select struct {
 	rawSelect string
+	where     *Condition
+	groupBy   []string
+	having    *Condition
+	orderBy   []string
 	args      []any
-	*selectBase
+	engine    Engine
 }
 
-// NewRawSelect constructs an Select with the provided provided engine and select statement.
-func NewRawSelect(engine Engine, rawSelect string, args ...any) *rawSelectData {
-	return &rawSelectData{
+// NewSelect constructs an Select with the provided provided engine and select statement.
+func NewSelect(engine Engine, rawSelect string, args ...any) *Select {
+	return &Select{
 		rawSelect: rawSelect,
 		args:      args,
-		selectBase: &selectBase{
-			engine: engine,
-		},
+		engine:    engine,
 	}
 }
 
 // Where for simple where condition initialization with AND operator.
-func (s *selectBase) Where(conditions ...Condition) *predicateData {
+func (s *Select) Where(conditions ...ExpressionBuilder) *Condition {
 	s.where = NewAnd(conditions...)
 	return s.where
 }
 
 // WhereOr for simple where condition initialization with OR operator.
-func (s *selectBase) WhereOr(conditions ...Condition) *predicateData {
+func (s *Select) WhereOr(conditions ...ExpressionBuilder) *Condition {
 	s.where = NewOr(conditions...)
 	return s.where
 }
 
 // GroupBy adds columns to GROUP BY statement.
-func (s *selectBase) GroupBy(columns ...string) {
+func (s *Select) GroupBy(columns ...string) {
 	s.groupBy = append(s.groupBy, columns...)
 }
 
 // OrderBy adds columns to ORDER BY statement.
-func (s *selectBase) OrderBy(columns ...string) {
+func (s *Select) OrderBy(columns ...string) {
 	s.orderBy = append(s.orderBy, columns...)
 }
 
@@ -72,13 +61,13 @@ func Desc(column string) string {
 }
 
 // Having for simple having condition initialization with AND operator.
-func (s *selectBase) Having(conditions ...Condition) *predicateData {
+func (s *Select) Having(conditions ...ExpressionBuilder) *Condition {
 	s.having = NewAnd(conditions...)
 	return s.having
 }
 
 // HavingOr for simple having condition initialization with OR operator.
-func (s *selectBase) HavingOr(conditions ...Condition) *predicateData {
+func (s *Select) HavingOr(conditions ...ExpressionBuilder) *Condition {
 	s.having = NewOr(conditions...)
 	return s.having
 }
@@ -131,7 +120,7 @@ func addCommaSeparated(keyword string, slice []string, sb *strings.Builder) {
 }
 
 // Build the SELECT command.
-func (s *rawSelectData) Build() (query string, args []any) {
+func (s *Select) Build() (query string, args []any) {
 	if s.rawSelect == "" {
 		return "", nil
 	}

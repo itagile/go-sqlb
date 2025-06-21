@@ -9,38 +9,27 @@ type Setter interface {
 	Set(name string, value any)
 }
 
-// Builder contract for building the final SQL.
-type Builder interface {
-	Build() (query string, args []any)
-}
-
-// Insert generates simple INSERT from values.
-type Insert interface {
-	Setter
-	Builder
-}
-
-type nameValue struct {
+type NameValue struct {
 	name  string
 	value any
 }
 
-type sqlData struct {
+type SQL struct {
 	table  string
-	index  map[string]*nameValue
-	values []*nameValue
+	index  map[string]*NameValue
+	values []*NameValue
 	engine Engine
 }
 
-type insertData struct {
-	*sqlData
+type Insert struct {
+	*SQL
 }
 
 // NewInsertWith constructs an Insert with the provided Engine.
-func NewInsert(engine Engine, table string) *insertData {
-	index := map[string]*nameValue{}
-	return &insertData{
-		sqlData: &sqlData{
+func NewInsert(engine Engine, table string) *Insert {
+	index := map[string]*NameValue{}
+	return &Insert{
+		SQL: &SQL{
 			table:  table,
 			index:  index,
 			engine: engine,
@@ -49,19 +38,19 @@ func NewInsert(engine Engine, table string) *insertData {
 }
 
 // Set column value in Setter contract.
-func (s *sqlData) Set(name string, value any) {
+func (s *SQL) Set(name string, value any) {
 	item, exists := s.index[name]
 	if exists {
 		item.value = value
 	} else {
-		item = &nameValue{name: name, value: value}
+		item = &NameValue{name: name, value: value}
 		s.values = append(s.values, item)
 		s.index[name] = item
 	}
 }
 
 // Build INSERT command.
-func (i *insertData) Build() (query string, args []any) {
+func (i *Insert) Build() (query string, args []any) {
 	if i.table == "" || len(i.values) == 0 {
 		return "", nil
 	}

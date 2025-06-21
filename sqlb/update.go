@@ -4,23 +4,16 @@ import (
 	"strings"
 )
 
-// Update generates simple UPDATE from values.
-type Update interface {
-	Setter
-	WhereBuilder
-	Builder
+type Update struct {
+	*SQL
+	where *Condition
 }
 
-type updateData struct {
-	*sqlData
-	where *predicateData
-}
-
-// NewUpdate constructs an Update with the provided ParameterPlaceholder.
-func NewUpdate(engine Engine, table string) *updateData {
-	index := map[string]*nameValue{}
-	return &updateData{
-		sqlData: &sqlData{
+// NewUpdate constructs an Update with the provided Placeholderer.
+func NewUpdate(engine Engine, table string) *Update {
+	index := map[string]*NameValue{}
+	return &Update{
+		SQL: &SQL{
 			table:  table,
 			index:  index,
 			engine: engine,
@@ -29,19 +22,19 @@ func NewUpdate(engine Engine, table string) *updateData {
 }
 
 // Where for simple where condition initialization with AND operator.
-func (u *updateData) Where(conditions ...Condition) *predicateData {
+func (u *Update) Where(conditions ...ExpressionBuilder) *Condition {
 	u.where = NewAnd(conditions...)
 	return u.where
 }
 
 // WhereOr for simple where condition initialization with OR operator.
-func (u *updateData) WhereOr(conditions ...Condition) *predicateData {
+func (u *Update) WhereOr(conditions ...ExpressionBuilder) *Condition {
 	u.where = NewOr(conditions...)
 	return u.where
 }
 
 // Build the UPDATE command.
-func (u *updateData) Build() (query string, args []any) {
+func (u *Update) Build() (query string, args []any) {
 	if u.table == "" || len(u.values) == 0 {
 		return "", nil
 	}
@@ -66,7 +59,7 @@ func (u *updateData) Build() (query string, args []any) {
 }
 
 // addWhere appends WHERE clause.
-func (u *updateData) addWhere(sb *strings.Builder, args []any) []any {
+func (u *Update) addWhere(sb *strings.Builder, args []any) []any {
 	if u.where == nil {
 		return args
 	}

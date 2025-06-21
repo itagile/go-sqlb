@@ -2,16 +2,16 @@ package sqlb
 
 import "strings"
 
-type Condition interface {
+type ExpressionBuilder interface {
 	Build(engine Engine) (query string, args []any)
 }
 
 type Predicate interface {
-	Condition
+	ExpressionBuilder
 	// Operator returns the logical operator used in the predicate, e.g., "AND" or "OR".
 	Operator() string
-	And(conditions ...Condition) *predicateData
-	Or(conditions ...Condition) *predicateData
+	And(conditions ...ExpressionBuilder) *Condition
+	Or(conditions ...ExpressionBuilder) *Condition
 }
 
 const (
@@ -19,23 +19,16 @@ const (
 	or  = "OR"
 )
 
-type WhereBuilder interface {
-	// Where for simple where condition initialization with AND operator.
-	Where(conditions ...Condition) *predicateData
-	// WhereOr for simple where condition initialization with OR operator.
-	WhereOr(conditions ...Condition) *predicateData
-}
-
-type predicateData struct {
+type Condition struct {
 	operator   string
-	conditions []Condition
+	conditions []ExpressionBuilder
 }
 
-func (p *predicateData) Operator() string {
+func (p *Condition) Operator() string {
 	return p.operator
 }
 
-func (p *predicateData) Build(engine Engine) (query string, args []any) {
+func (p *Condition) Build(engine Engine) (query string, args []any) {
 	if p == nil || len(p.conditions) == 0 {
 		return "", nil
 	}
@@ -57,7 +50,7 @@ func (p *predicateData) Build(engine Engine) (query string, args []any) {
 	return sb.String(), args
 }
 
-func (p *predicateData) addCond(sb *strings.Builder, queryCond string, operatorSearch string) {
+func (p *Condition) addCond(sb *strings.Builder, queryCond string, operatorSearch string) {
 	if sb.Len() > 0 {
 		sb.WriteRune(' ')
 		sb.WriteString(p.operator)
@@ -73,22 +66,22 @@ func (p *predicateData) addCond(sb *strings.Builder, queryCond string, operatorS
 	}
 }
 
-func newPredicateData(operator string, conditions []Condition) *predicateData {
-	return &predicateData{
+func NewCondition(operator string, conditions []ExpressionBuilder) *Condition {
+	return &Condition{
 		operator:   operator,
 		conditions: conditions,
 	}
 }
 
-func NewAnd(conditions ...Condition) *predicateData {
-	return newPredicateData(and, conditions)
+func NewAnd(conditions ...ExpressionBuilder) *Condition {
+	return NewCondition(and, conditions)
 }
 
-func NewOr(conditions ...Condition) *predicateData {
-	return newPredicateData(or, conditions)
+func NewOr(conditions ...ExpressionBuilder) *Condition {
+	return NewCondition(or, conditions)
 }
 
-func (p *predicateData) And(conditions ...Condition) *predicateData {
+func (p *Condition) And(conditions ...ExpressionBuilder) *Condition {
 	if p.operator == and {
 		p.conditions = append(p.conditions, conditions...)
 	} else {
@@ -97,7 +90,7 @@ func (p *predicateData) And(conditions ...Condition) *predicateData {
 	return p
 }
 
-func (p *predicateData) Or(conditions ...Condition) *predicateData {
+func (p *Condition) Or(conditions ...ExpressionBuilder) *Condition {
 	if p.operator == or {
 		p.conditions = append(p.conditions, conditions...)
 	} else {

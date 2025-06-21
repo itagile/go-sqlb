@@ -4,40 +4,34 @@ import (
 	"strings"
 )
 
-// Delete generates simple UPDATE from values.
-type Delete interface {
-	WhereBuilder
-	Builder
-}
-
-type deleteData struct {
+type Delete struct {
 	engine Engine
 	table  string
-	where  *predicateData
+	where  *Condition
 }
 
 // NewDelete constructs an Delete with the provided engine and table name.
-func NewDelete(engine Engine, table string) *deleteData {
-	return &deleteData{
+func NewDelete(engine Engine, table string) *Delete {
+	return &Delete{
 		engine: engine,
 		table:  table,
 	}
 }
 
 // Where for simple where condition initialization with AND operator.
-func (d *deleteData) Where(conditions ...Condition) *predicateData {
+func (d *Delete) Where(conditions ...ExpressionBuilder) *Condition {
 	d.where = NewAnd(conditions...)
 	return d.where
 }
 
 // Where for simple where condition initialization with OR operator.
-func (d *deleteData) WhereOr(conditions ...Condition) *predicateData {
+func (d *Delete) WhereOr(conditions ...ExpressionBuilder) *Condition {
 	d.where = NewOr(conditions...)
 	return d.where
 }
 
 // Build the UPDATE command.
-func (d *deleteData) Build() (query string, args []any) {
+func (d *Delete) Build() (query string, args []any) {
 	if d.table == "" {
 		return "", nil
 	}
@@ -49,7 +43,7 @@ func (d *deleteData) Build() (query string, args []any) {
 }
 
 // addWhere appends WHERE clause.
-func (d *deleteData) addWhere(sb *strings.Builder, args []any) []any {
+func (d *Delete) addWhere(sb *strings.Builder, args []any) []any {
 	if d.where == nil {
 		return args
 	}

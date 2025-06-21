@@ -2,16 +2,16 @@ package sqlb
 
 import "strings"
 
-type expresisonEqData struct {
-	expressionData
+type ExpressionEq struct {
+	Expression
 	value any
 }
 
-func (e expresisonEqData) Build(engine Engine) (query string, args []any) {
-	return BuildExpression(e.expressionData, engine, e.buildHandler)
+func (e ExpressionEq) Build(engine Engine) (query string, args []any) {
+	return BuildExpression(e.Expression, engine, e.buildHandler)
 }
 
-func (e expresisonEqData) buildHandler(engine Engine, expression string, sb *strings.Builder) (args []any) {
+func (e ExpressionEq) buildHandler(engine Engine, expression string, sb *strings.Builder) (args []any) {
 	sb.WriteString(expression)
 	if e.value == nil {
 		sb.WriteString(" IS NULL")
@@ -23,9 +23,9 @@ func (e expresisonEqData) buildHandler(engine Engine, expression string, sb *str
 	return args
 }
 
-func (e expressionData) Eq(value any) Condition {
-	return &expresisonEqData{
-		expressionData: e,
-		value:          value,
+func (e Expression) Eq(value any) ExpressionBuilder {
+	return &ExpressionEq{
+		Expression: e,
+		value:      value,
 	}
 }

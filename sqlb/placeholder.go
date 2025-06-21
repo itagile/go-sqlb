@@ -2,40 +2,40 @@ package sqlb
 
 import "fmt"
 
-// Placeholderer generates de placeholder used in SQL commands.
+// Placeholderer generates de placeholder used in SQL commands
 type Placeholderer interface {
 	Placeholder() string
 }
 
-// QuestionPlaceholder is a ParameterPlaceholder based on a constant token.
-type QuestionPlaceholder string
+// StringPlaceholder is a Placeholderer based on a constant token
+type StringPlaceholder string
 
-// QuestionPlaceholderData defines the standard placeholder for dbs like mysql.
-const QuestionPlaceholderData QuestionPlaceholder = "?"
+// QuestionPlaceholder defines the standard placeholder for dbs like mysql
+const QuestionPlaceholder StringPlaceholder = "?"
 
-// Get the parameter placeholder.
-func (t QuestionPlaceholder) Placeholder() string {
+// Get the parameter placeholder
+func (t StringPlaceholder) Placeholder() string {
 	return string(t)
 }
 
-// sequencePlaceholderData for placeholders requiring numeric sequence.
-type sequencePlaceholderData struct {
+// SequencePlaceholder for placeholders requiring numeric sequence
+type SequencePlaceholder struct {
 	prefix  string
 	current int
 }
 
-// Get the parameter placeholder using this sequence.
-func (s *sequencePlaceholderData) Placeholder() string {
+// Get the parameter placeholder using this sequence
+func (s *SequencePlaceholder) Placeholder() string {
 	s.current++
 	return fmt.Sprint(s.prefix, s.current)
 }
 
-// NewDollarPlaceholder for PostgreSQL.
+// NewDollarPlaceholder for PostgreSQL
 func NewDollarPlaceholder() Placeholderer {
-	return &sequencePlaceholderData{prefix: "$"}
+	return &SequencePlaceholder{prefix: "$"}
 }
 
-// NewColonPlaceholder for ORACLE.
+// NewColonPlaceholder for ORACLE
 func NewColonPlaceholder() Placeholderer {
-	return &sequencePlaceholderData{prefix: ":v"}
+	return &SequencePlaceholder{prefix: ":v"}
 }

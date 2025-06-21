@@ -2,22 +2,22 @@ package sqlb
 
 import "strings"
 
-type expressionData []string
+type Expression []string
 
-func Expr(expressions ...string) expressionData {
+func Expr(expressions ...string) Expression {
 	return expressions
 }
 
-type ExpressionBuilder func(engine Engine, expression string, sb *strings.Builder) []any
+type ExpressionHandler func(engine Engine, expression string, sb *strings.Builder) []any
 
-func (e expressionData) Build(engine Engine) (query string, args []any) {
+func (e Expression) Build(engine Engine) (query string, args []any) {
 	return BuildExpression(e, engine, func(engine Engine, expression string, sb *strings.Builder) []any {
 		sb.WriteString(expression)
 		return nil
 	})
 }
 
-func BuildExpression(e expressionData, engine Engine, handler ExpressionBuilder) (query string, args []any) {
+func BuildExpression(e Expression, engine Engine, handler ExpressionHandler) (query string, args []any) {
 	var sb strings.Builder
 	args = make([]any, 0, len(e))
 	enclose := false

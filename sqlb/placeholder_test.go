@@ -8,7 +8,7 @@ import (
 )
 
 func TestDefaultDollarPlaceholder(t *testing.T) {
-	param := sqlb.QuestionPlaceholderData
+	param := sqlb.QuestionPlaceholder
 	require.Equal(t, "?", param.Placeholder())
 	require.Equal(t, "?", param.Placeholder())
 }
