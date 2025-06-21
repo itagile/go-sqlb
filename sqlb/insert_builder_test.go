@@ -10,7 +10,7 @@ import (
 func TestNewInsertBuilder(t *testing.T) {
 	expected := `INSERT INTO schema.myTable (Col1, Col2)
 VALUES (?, ?)`
-	ins := sqlb.NewInsertBuilder("schema.myTable", sqlb.DefaultEngine())
+	ins := sqlb.NewInsertBuilder(sqlb.DefaultEngine(), "schema.myTable")
 	ins.Set("Col1", 1)
 	ins.Set("Col2", "2")
 	query, args := ins.Build()
@@ -21,7 +21,7 @@ VALUES (?, ?)`
 func TestNewPostgreSQLInsertBuilder(t *testing.T) {
 	expected := `INSERT INTO schema.myTable (Col1)
 VALUES ($1)`
-	ins := sqlb.NewInsertBuilder("schema.myTable", sqlb.PostgreSQLEngine())
+	ins := sqlb.NewInsertBuilder(sqlb.PostgreSQLEngine(), "schema.myTable")
 	ins.Set("Col1", 1)
 	query, args := ins.Build()
 	require.Equal(t, expected, query)
@@ -31,7 +31,7 @@ VALUES ($1)`
 func TestNewORAInsertBuilder(t *testing.T) {
 	expected := `INSERT INTO schema.myTable (Col1, Col2)
 VALUES (:v1, :v2)`
-	ins := sqlb.NewInsertBuilder("schema.myTable", sqlb.ORACLEEngine())
+	ins := sqlb.NewInsertBuilder(sqlb.ORACLEEngine(), "schema.myTable")
 	ins.Set("Col1", 1)
 	ins.Set("Col2", "2")
 	query, args := ins.Build()
@@ -41,7 +41,7 @@ VALUES (:v1, :v2)`
 
 func TestEmptyInsertBuilderWhenNoColumnsSet(t *testing.T) {
 	expected := ""
-	ins := sqlb.NewInsertBuilder("schema.myTable", sqlb.DefaultEngine())
+	ins := sqlb.NewInsertBuilder(sqlb.DefaultEngine(), "schema.myTable")
 	query, args := ins.Build()
 	require.Equal(t, expected, query)
 	require.Nil(t, args)
@@ -49,7 +49,7 @@ func TestEmptyInsertBuilderWhenNoColumnsSet(t *testing.T) {
 
 func TestEmptyInsertBuilderWhenNoTableName(t *testing.T) {
 	expected := ""
-	ins := sqlb.NewInsertBuilder("", sqlb.DefaultEngine())
+	ins := sqlb.NewInsertBuilder(sqlb.DefaultEngine(), "")
 	ins.Set("Col1", 1)
 	query, args := ins.Build()
 	require.Equal(t, expected, query)
@@ -57,7 +57,7 @@ func TestEmptyInsertBuilderWhenNoTableName(t *testing.T) {
 }
 
 func TestInsertBuilderWhenValueChanged(t *testing.T) {
-	ins := sqlb.NewInsertBuilder("schema.myTable", sqlb.DefaultEngine())
+	ins := sqlb.NewInsertBuilder(sqlb.DefaultEngine(), "schema.myTable")
 	ins.Set("Col1", 1)
 	ins.Set("Col1", 2)
 	_, args := ins.Build()

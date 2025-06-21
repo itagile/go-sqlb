@@ -6,7 +6,7 @@ import (
 
 // DeleteBuilder generates simple UPDATE from values
 type DeleteBuilder interface {
-	Setter
+	WhereBuilder
 	SQLBuilder
 }
 
@@ -50,11 +50,14 @@ func (d *deleteBuilderData) Build() (query string, args []any) {
 
 // addWhere appends WHERE clause
 func (d *deleteBuilderData) addWhere(sb *strings.Builder, args []any) []any {
-	queryWhere, argsWhere := d.where.Build(d.engine)
-	if len(queryWhere) > 0 {
-		sb.WriteString("\nWHERE ")
-		sb.WriteString(queryWhere)
-		args = append(args, argsWhere...)
+	if d.where == nil {
+		return args
 	}
-	return args
+	queryWhere, argsWhere := d.where.Build(d.engine)
+	if len(queryWhere) == 0 {
+		return args
+	}
+	sb.WriteString("\nWHERE ")
+	sb.WriteString(queryWhere)
+	return append(args, argsWhere...)
 }

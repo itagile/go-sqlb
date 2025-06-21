@@ -6,14 +6,33 @@ type Condition interface {
 	Build(engine Engine) (query string, args []any)
 }
 
+type Predicate interface {
+	Condition
+	// Operator returns the logical operator used in the predicate, e.g., "AND" or "OR".
+	Operator() string
+	And(conditions ...Condition) *predicateData
+	Or(conditions ...Condition) *predicateData
+}
+
 const (
 	and = "AND"
 	or  = "OR"
 )
 
+type WhereBuilder interface {
+	// Where for simple where condition initialization with AND operator
+	Where(conditions ...Condition) *predicateData
+	// WhereOr for simple where condition initialization with OR operator
+	WhereOr(conditions ...Condition) *predicateData
+}
+
 type predicateData struct {
 	operator   string
 	conditions []Condition
+}
+
+func (p *predicateData) Operator() string {
+	return p.operator
 }
 
 func (p *predicateData) Build(engine Engine) (query string, args []any) {

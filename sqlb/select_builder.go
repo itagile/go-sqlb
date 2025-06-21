@@ -23,7 +23,7 @@ type rawSelectBuilderData struct {
 	*selectBuilderBase
 }
 
-// NewSelectBuilder constructs an SelectBuilder with the provided ParameterPlaceholder
+// NewRawSelectBuilder constructs an SelectBuilder with the provided ParameterPlaceholder
 func NewRawSelectBuilder(engine Engine, rawSelect string, args ...any) *rawSelectBuilderData {
 	return &rawSelectBuilderData{
 		rawSelect: rawSelect,
@@ -85,6 +85,7 @@ func (s *selectBuilderBase) HavingOr(conditions ...Condition) *predicateData {
 
 // includesClause detects if raw query includes clause. Query parameter comes with ToUpper applied
 func includesClause(rawSelectUpper string, clause string) bool {
+	// TODO remove parentheses from rawSelectUpper
 	index := strings.LastIndex(rawSelectUpper, clause)
 	if index < 0 {
 		return false
@@ -98,23 +99,26 @@ func includesClause(rawSelectUpper string, clause string) bool {
 }
 
 // addClause adds the clause to the sb using the predicate
-func addClause(clause string, p *predicateData, engine Engine, sb *strings.Builder,
+func addClause(clause string, p Predicate, engine Engine, sb *strings.Builder,
 	args []any, rawSelectUpper string) []any {
-	queryWhere, argsWhere := p.Build(engine)
-	if len(queryWhere) > 0 {
-		var text string
-		if includesClause(rawSelectUpper, clause) {
-			text = p.operator
-		} else {
-			text = clause
-		}
-		sb.WriteRune('\n')
-		sb.WriteString(text)
-		sb.WriteRune(' ')
-		sb.WriteString(queryWhere)
-		args = append(args, argsWhere...)
+	if p == nil {
+		return args
 	}
-	return args
+	queryClause, argsClause := p.Build(engine)
+	if len(queryClause) == 0 {
+		return args
+	}
+	var text string
+	if includesClause(rawSelectUpper, clause) {
+		text = p.getOperator()
+	} else {
+		text = clause
+	}
+	sb.WriteRune('\n')
+	sb.WriteString(text)
+	sb.WriteRune(' ')
+	sb.WriteString(queryClause)
+	return append(args, argsClause...)
 }
 
 func addCommaSeparated(keyword string, slice []string, sb *strings.Builder) {

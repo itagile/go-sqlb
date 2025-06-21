@@ -7,6 +7,7 @@ import (
 // UpdateBuilder generates simple UPDATE from values
 type UpdateBuilder interface {
 	Setter
+	WhereBuilder
 	SQLBuilder
 }
 
@@ -66,11 +67,14 @@ func (u *updateBuilderData) Build() (query string, args []any) {
 
 // addWhere appends WHERE clause
 func (u *updateBuilderData) addWhere(sb *strings.Builder, args []any) []any {
-	queryWhere, argsWhere := u.where.Build(u.engine)
-	if len(queryWhere) > 0 {
-		sb.WriteString("\nWHERE ")
-		sb.WriteString(queryWhere)
-		args = append(args, argsWhere...)
+	if u.where == nil {
+		return args
 	}
-	return args
+	queryWhere, argsWhere := u.where.Build(u.engine)
+	if len(queryWhere) == 0 {
+		return args
+	}
+	sb.WriteString("\nWHERE ")
+	sb.WriteString(queryWhere)
+	return append(args, argsWhere...)
 }

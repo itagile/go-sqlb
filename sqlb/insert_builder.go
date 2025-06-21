@@ -37,7 +37,7 @@ type insertBuilderData struct {
 }
 
 // NewInsertBuilderWith constructs an InsertBuilder with the provided Engine
-func NewInsertBuilder(table string, engine Engine) *insertBuilderData {
+func NewInsertBuilder(engine Engine, table string) *insertBuilderData {
 	index := map[string]*nameValue{}
 	return &insertBuilderData{
 		sqlData: &sqlData{
